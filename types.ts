@@ -35,6 +35,13 @@ export enum LeadStatus {
   Closed = 'Closed',
 }
 
+export interface LeadActivity {
+  id: string;
+  type: 'status_change' | 'note' | 'creation' | 'assignment' | 'update';
+  description: string;
+  date: string;
+}
+
 export interface Lead {
   id: string;
   name: string;
@@ -47,6 +54,7 @@ export interface Lead {
   avatar?: string;
   notes?: string;
   createdAt?: string;
+  activities?: LeadActivity[];
 }
 
 export interface NavItem {
@@ -60,4 +68,8 @@ export interface User {
   name: string;
   email: string;
   avatar?: string;
+  role?: string;
+  phone?: string;
+  bio?: string;
+  location?: string;
 }

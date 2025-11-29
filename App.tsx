@@ -7,16 +7,12 @@ import { Properties } from './pages/Properties';
 import { Leads } from './pages/Leads';
 import { Landing } from './pages/Landing';
 import { Plans } from './pages/Plans';
+import { Settings } from './pages/Settings';
+import { Profile } from './pages/Profile';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LeadsProvider } from './context/LeadsContext';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
-
-const SettingsPlaceholder = () => (
-  <div className="flex items-center justify-center h-full text-slate-400 dark:text-slate-500">
-    Settings Page Coming Soon
-  </div>
-);
 
 const AppRoutes: React.FC = () => {
   return (
@@ -31,7 +27,8 @@ const AppRoutes: React.FC = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/properties" element={<Properties />} />
           <Route path="/leads" element={<Leads />} />
-          <Route path="/settings" element={<SettingsPlaceholder />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Route>
 

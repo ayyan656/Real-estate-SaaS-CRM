@@ -48,8 +48,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const register = async (name: string, email: string, password: string) => {
     // Mock API call
-    return new Promise<void>((resolve) => {
+    return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
+        if (!name || !email || !password) {
+           reject(new Error('Missing fields'));
+           return;
+        }
         const mockUser: User = {
           id: Date.now().toString(),
           name: name,
@@ -64,7 +68,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const googleLogin = async () => {
-    // Mock Google Login
+    // Mock Google Login / Passport.js OAuth2 Flow
+    // In a real application with Passport.js:
+    // 1. Frontend redirects user to backend: window.location.href = 'http://api.yoursite.com/auth/google'
+    // 2. Backend (Passport) redirects to Google Consent Screen
+    // 3. User approves, Google redirects back to backend callback URL
+    // 4. Backend processes user and redirects to Frontend with a token (e.g. ?token=xyz) or sets a cookie
+    
     return new Promise<void>((resolve) => {
       setTimeout(() => {
         const mockUser: User = {

@@ -181,7 +181,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose }) => {
       ref={widgetRef}
       className="fixed bottom-4 right-4 z-50 flex flex-col items-end animate-in slide-in-from-bottom-5 fade-in duration-300"
     >
-      <div className="bg-white w-[350px] md:w-[380px] h-[500px] rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden font-sans">
+      <div className="bg-white dark:bg-slate-900 w-[350px] md:w-[380px] h-[500px] rounded-2xl shadow-2xl border border-gray-200 dark:border-slate-800 flex flex-col overflow-hidden font-sans transition-colors duration-200">
         
         {/* Header */}
         <div className="bg-primary p-4 flex items-center justify-between text-white shadow-md">
@@ -203,7 +203,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 bg-slate-50 p-4 overflow-y-auto space-y-4">
+        <div className="flex-1 bg-slate-50 dark:bg-slate-950 p-4 overflow-y-auto space-y-4 scroll-smooth">
           {messages.map((msg) => (
             <div 
               key={msg.id} 
@@ -214,7 +214,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose }) => {
                   max-w-[80%] rounded-2xl px-4 py-3 text-sm shadow-sm
                   ${msg.sender === 'user' 
                     ? 'bg-accent text-white rounded-br-none' 
-                    : 'bg-white text-slate-800 border border-gray-100 rounded-bl-none'
+                    : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-gray-100 dark:border-slate-700 rounded-bl-none'
                   }
                 `}
               >
@@ -222,7 +222,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose }) => {
                 {msg.image && (
                   <img src={msg.image} alt="Uploaded" className="rounded-lg max-w-full mt-1 border border-white/20" />
                 )}
-                <p className={`text-[10px] mt-1 text-right opacity-70 ${msg.sender === 'user' ? 'text-blue-100' : 'text-slate-400'}`}>
+                <p className={`text-[10px] mt-1 text-right opacity-70 ${msg.sender === 'user' ? 'text-blue-100' : 'text-slate-400 dark:text-slate-500'}`}>
                   {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
@@ -230,7 +230,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose }) => {
           ))}
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-none px-4 py-3 shadow-sm">
+              <div className="bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl rounded-bl-none px-4 py-3 shadow-sm">
                 <div className="flex gap-1">
                   <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></span>
                   <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-100"></span>
@@ -243,14 +243,14 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 bg-white border-t border-gray-100">
+        <div className="p-4 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800">
            {showEmojiPicker && (
-             <div className="absolute bottom-20 left-4 bg-white shadow-xl border border-gray-200 rounded-xl p-3 grid grid-cols-6 gap-2 animate-in zoom-in-95 duration-100">
+             <div className="absolute bottom-20 left-4 bg-white dark:bg-slate-800 shadow-xl border border-gray-200 dark:border-slate-700 rounded-xl p-3 grid grid-cols-6 gap-2 animate-in zoom-in-95 duration-100">
                {COMMON_EMOJIS.map(emoji => (
                  <button 
                    key={emoji} 
                    onClick={() => addEmoji(emoji)}
-                   className="text-xl hover:bg-slate-100 p-1 rounded transition-colors"
+                   className="text-xl hover:bg-slate-100 dark:hover:bg-slate-700 p-1 rounded transition-colors"
                  >
                    {emoji}
                  </button>
@@ -259,7 +259,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose }) => {
            )}
 
            <div className="flex items-end gap-2">
-             <div className="flex-1 bg-slate-50 border border-gray-200 rounded-xl flex items-center p-1 relative focus-within:ring-2 focus-within:ring-accent/20 focus-within:border-accent transition-all">
+             <div className="flex-1 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center p-1 relative focus-within:ring-2 focus-within:ring-accent/20 transition-all">
                 <input 
                   type="file" 
                   ref={fileInputRef}
@@ -269,14 +269,14 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose }) => {
                 />
                 <button 
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-lg transition-colors"
+                  className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
                   title="Upload Image"
                 >
                   <ImageIcon size={20} />
                 </button>
                 <button 
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className={`p-2 hover:bg-slate-200 rounded-lg transition-colors ${showEmojiPicker ? 'text-yellow-500' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors ${showEmojiPicker ? 'text-yellow-500' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'}`}
                   title="Add Emoji"
                 >
                   <Smile size={20} />
@@ -286,10 +286,10 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose }) => {
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
                   placeholder={PLACEHOLDERS[placeholderIndex]}
-                  className="flex-1 bg-transparent focus:ring-0 resize-none h-10 py-2 px-2 text-sm text-slate-800 placeholder:text-slate-400 placeholder:transition-opacity placeholder:duration-300"
+                  className="flex-1 bg-transparent border-none outline-none focus:ring-0 resize-none h-10 py-2 px-2 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 placeholder:transition-opacity placeholder:duration-300"
                   rows={1}
                 />
-                <div className="absolute bottom-1 right-2 text-[10px] text-slate-400 bg-slate-50/80 px-1 pointer-events-none">
+                <div className="absolute bottom-1 right-2 text-[10px] text-slate-400 dark:text-slate-500 bg-slate-50/80 dark:bg-slate-800/80 px-1 pointer-events-none">
                   {inputText.length}/{MAX_CHARS}
                 </div>
              </div>

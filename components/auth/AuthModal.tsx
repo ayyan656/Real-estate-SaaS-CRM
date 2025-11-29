@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { X, Mail, Lock, User, Loader2 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { useAuth } from '../../context/AuthContext';
@@ -11,52 +11,62 @@ interface AuthModalProps {
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const { login, register, googleLogin } = useAuth();
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Form State
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  // Login Form State
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+
+  // Signup Form State
+  const [signupName, setSignupName] = useState('');
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-
     try {
-      if (mode === 'login') {
-        await login(email, password);
-      } else {
-        await register(name, email, password);
-      }
+      await login(loginEmail, loginPassword);
       onClose();
     } catch (err) {
-      setError('Authentication failed. Please try again.');
+      setError('Invalid email or password. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const handleSignupSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError('');
     setIsLoading(true);
     try {
-      await googleLogin();
+      await register(signupName, signupEmail, signupPassword);
       onClose();
     } catch (err) {
-      setError('Google sign in failed.');
+      setError('Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const toggleMode = () => {
-    setMode(mode === 'login' ? 'signup' : 'login');
+  const handleGoogleAuth = async () => {
     setError('');
+    setIsLoading(true);
+    try {
+      // In a real app, this would redirect to your Passport.js backend route
+      // e.g., window.location.href = '/auth/google';
+      await googleLogin();
+      onClose();
+    } catch (err) {
+      setError('Google authentication failed.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const GoogleIcon = () => (
@@ -74,34 +84,46 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         className="bg-surface dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-transparent dark:border-slate-800"
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="bg-primary p-6 text-white text-center relative">
+        {/* Header with Tabs */}
+        <div className="bg-primary dark:bg-slate-950 p-0 relative">
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+            className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-10"
           >
             <X size={20} />
           </button>
-          <h2 className="text-2xl font-bold mb-1">
-            {mode === 'login' ? 'Welcome Back' : 'Create Account'}
-          </h2>
-          <p className="text-slate-300 text-sm">
-            {mode === 'login' 
-              ? 'Enter your details to access your account' 
-              : 'Join EstateFlow to manage your properties'
-            }
-          </p>
+          
+          <div className="flex">
+            <button
+              onClick={() => { setActiveTab('login'); setError(''); }}
+              className={`flex-1 py-6 text-center font-semibold text-sm transition-colors relative ${
+                activeTab === 'login' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Sign In
+              {activeTab === 'login' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-accent" />}
+            </button>
+            <button
+              onClick={() => { setActiveTab('signup'); setError(''); }}
+              className={`flex-1 py-6 text-center font-semibold text-sm transition-colors relative ${
+                activeTab === 'signup' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Create Account
+              {activeTab === 'signup' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-accent" />}
+            </button>
+          </div>
         </div>
 
         <div className="p-6 md:p-8">
-          {/* Google Login */}
+          {/* Google Login (Common for both) */}
           <button
-            onClick={handleGoogleLogin}
+            onClick={handleGoogleAuth}
             disabled={isLoading}
             className="w-full flex items-center justify-center bg-white border border-gray-300 text-slate-700 font-medium py-2.5 px-4 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 mb-6"
           >
             {isLoading ? <Loader2 className="animate-spin w-5 h-5 text-slate-400" /> : <GoogleIcon />}
-            <span>Sign {mode === 'login' ? 'in' : 'up'} with Google</span>
+            <span>Continue with Google</span>
           </button>
 
           <div className="relative mb-6">
@@ -113,66 +135,124 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === 'signup' && (
+          {/* Login Form */}
+          {activeTab === 'login' && (
+            <form onSubmit={handleLoginSubmit} className="space-y-4 animate-in slide-in-from-right-4 duration-200">
               <div className="relative">
-                <User className="absolute top-3 left-3 text-slate-400 w-5 h-5" />
+                <Mail className="absolute top-3 left-3 text-slate-400 w-5 h-5" />
                 <Input 
-                  placeholder="Full Name" 
-                  value={name} 
-                  onChange={e => setName(e.target.value)} 
+                  type="email" 
+                  placeholder="Email Address" 
+                  value={loginEmail} 
+                  onChange={e => setLoginEmail(e.target.value)} 
                   className="pl-10"
                   required
                 />
               </div>
-            )}
-            <div className="relative">
-              <Mail className="absolute top-3 left-3 text-slate-400 w-5 h-5" />
-              <Input 
-                type="email" 
-                placeholder="Email Address" 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-                className="pl-10"
-                required
-              />
-            </div>
-            <div className="relative">
-              <Lock className="absolute top-3 left-3 text-slate-400 w-5 h-5" />
-              <Input 
-                type="password" 
-                placeholder="Password" 
-                value={password} 
-                onChange={e => setPassword(e.target.value)} 
-                className="pl-10"
-                required
-              />
-            </div>
+              <div className="relative">
+                <Lock className="absolute top-3 left-3 text-slate-400 w-5 h-5" />
+                <Input 
+                  type="password" 
+                  placeholder="Password" 
+                  value={loginPassword} 
+                  onChange={e => setLoginPassword(e.target.value)} 
+                  className="pl-10"
+                  required
+                />
+              </div>
 
-            {error && (
-              <p className="text-sm text-red-600 bg-red-50 dark:bg-red-900/20 p-2 rounded text-center">{error}</p>
-            )}
+              <div className="flex justify-end">
+                <button type="button" className="text-xs text-slate-500 hover:text-accent">Forgot password?</button>
+              </div>
 
-            <Button 
-              type="submit" 
-              className="w-full" 
-              size="lg"
-              isLoading={isLoading}
-            >
-              {mode === 'login' ? 'Sign In' : 'Create Account'}
-            </Button>
-          </form>
+              {error && (
+                <p className="text-sm text-red-600 bg-red-50 dark:bg-red-900/20 p-2 rounded text-center">{error}</p>
+              )}
 
-          <div className="mt-6 text-center text-sm">
-            <span className="text-slate-500 dark:text-slate-400">
-              {mode === 'login' ? "Don't have an account?" : "Already have an account?"}
-            </span>
-            <button 
-              onClick={toggleMode}
-              className="ml-1 font-medium text-accent hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
-            >
-              {mode === 'login' ? 'Sign up' : 'Log in'}
-            </button>
+              <Button 
+                type="submit" 
+                className="w-full" 
+                size="lg"
+                isLoading={isLoading}
+              >
+                Sign In
+              </Button>
+            </form>
+          )}
+
+          {/* Signup Form */}
+          {activeTab === 'signup' && (
+            <form onSubmit={handleSignupSubmit} className="space-y-4 animate-in slide-in-from-left-4 duration-200">
+              <div className="relative">
+                <User className="absolute top-3 left-3 text-slate-400 w-5 h-5" />
+                <Input 
+                  placeholder="Full Name" 
+                  value={signupName} 
+                  onChange={e => setSignupName(e.target.value)} 
+                  className="pl-10"
+                  required
+                />
+              </div>
+              <div className="relative">
+                <Mail className="absolute top-3 left-3 text-slate-400 w-5 h-5" />
+                <Input 
+                  type="email" 
+                  placeholder="Email Address" 
+                  value={signupEmail} 
+                  onChange={e => setSignupEmail(e.target.value)} 
+                  className="pl-10"
+                  required
+                />
+              </div>
+              <div className="relative">
+                <Lock className="absolute top-3 left-3 text-slate-400 w-5 h-5" />
+                <Input 
+                  type="password" 
+                  placeholder="Create Password" 
+                  value={signupPassword} 
+                  onChange={e => setSignupPassword(e.target.value)} 
+                  className="pl-10"
+                  required
+                  minLength={6}
+                />
+              </div>
+
+              {error && (
+                <p className="text-sm text-red-600 bg-red-50 dark:bg-red-900/20 p-2 rounded text-center">{error}</p>
+              )}
+
+              <Button 
+                type="submit" 
+                className="w-full" 
+                size="lg"
+                isLoading={isLoading}
+              >
+                Create Account
+              </Button>
+              
+              <p className="text-xs text-center text-slate-500 dark:text-slate-400 mt-4">
+                By creating an account, you agree to our Terms of Service and Privacy Policy.
+              </p>
+            </form>
+          )}
+
+          {/* Footer toggle */}
+          <div className="mt-6 text-center text-sm pt-4 border-t border-gray-100 dark:border-slate-800">
+             {activeTab === 'login' ? (
+                <>
+                  <span className="text-slate-500 dark:text-slate-400">Don't have an account? </span>
+                  <button onClick={() => { setActiveTab('signup'); setError(''); }} className="font-medium text-accent hover:underline">
+                    Sign up
+                  </button>
+                </>
+             ) : (
+                <>
+                  <span className="text-slate-500 dark:text-slate-400">Already have an account? </span>
+                  <button onClick={() => { setActiveTab('login'); setError(''); }} className="font-medium text-accent hover:underline">
+                    Sign in
+                  </button>
+                </>
+             )}
           </div>
         </div>
       </div>

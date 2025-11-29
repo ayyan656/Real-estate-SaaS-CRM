@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Building2, Users, Settings, LogOut, Menu, X, User as UserIcon, ChevronDown } from 'lucide-react';
 import { NavItem } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -20,6 +20,7 @@ export const Layout: React.FC = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -32,6 +33,7 @@ export const Layout: React.FC = () => {
   }, []);
 
   const getPageTitle = () => {
+    if (location.pathname === '/profile') return 'My Profile';
     const item = NAV_ITEMS.find(i => i.path === location.pathname);
     return item ? item.label : 'Dashboard';
   };
@@ -115,16 +117,22 @@ export const Layout: React.FC = () => {
 
                 {/* Dropdown Menu */}
                 {isProfileDropdownOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-lg shadow-lg border border-gray-100 dark:border-slate-800 py-2 animate-in fade-in zoom-in-95 duration-150 origin-top-right">
+                  <div className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-lg shadow-lg border border-gray-100 dark:border-slate-800 py-2 animate-in fade-in zoom-in-95 duration-150 origin-top-right z-50">
                     <div className="px-4 py-2 border-b border-gray-50 dark:border-slate-800">
                       <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{user.name}</p>
                       <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
                     </div>
                     <div className="py-1">
-                      <button className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 flex items-center gap-2">
+                      <button 
+                        onClick={() => { navigate('/profile'); setIsProfileDropdownOpen(false); }}
+                        className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 flex items-center gap-2"
+                      >
                         <UserIcon size={16} /> Profile
                       </button>
-                      <button className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 flex items-center gap-2">
+                      <button 
+                        onClick={() => { navigate('/settings'); setIsProfileDropdownOpen(false); }}
+                        className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 flex items-center gap-2"
+                      >
                         <Settings size={16} /> Settings
                       </button>
                     </div>
@@ -178,7 +186,10 @@ export const Layout: React.FC = () => {
                 ))}
               </nav>
               <div className="border-t border-slate-700 pt-4">
-                <div className="flex items-center gap-3 mb-4 px-2">
+                <div 
+                   className="flex items-center gap-3 mb-4 px-2 cursor-pointer hover:bg-slate-800 p-2 rounded-lg transition-colors"
+                   onClick={() => { navigate('/profile'); setIsMobileMenuOpen(false); }}
+                >
                     {user.avatar ? (
                       <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full" />
                     ) : (
